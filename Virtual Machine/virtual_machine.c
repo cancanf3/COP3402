@@ -49,19 +49,18 @@ int main () {
 	ir.l = 0;
 	ir.m = 0;
 
-	int i;
-	for (i = 0 ; i < 16 ; i++)
+	for (int i = 0 ; i < 16 ; i++)
 		rf[i] = 0;
-	for (i = 0 ; i < MAX_STACK_HEIGHT ; i++)
+	for (int i = 0 ; i < MAX_STACK_HEIGHT ; i++)
 		stack[i] = 0;
-	for (i = 0 ; i < MAX_CODE_LENGTH ; i++) {
+	for (int i = 0 ; i < MAX_CODE_LENGTH ; i++) {
 		code[i].op = 0;
 		code[i].r = 0;
 		code[i].l = 0;
 		code[i].m = 0;
 	}
 
-	for ( i = 0 ; i < MAX_LEXI_LEVELS ; i++)
+	for ( int i = 0 ; i < MAX_LEXI_LEVELS ; i++)
 		mark[i] = 0;
 
 	int instructions = load_Instruction(code);
@@ -72,7 +71,7 @@ int main () {
 
 	int halt = 0;
 	int call = 0;
-	i = 0;
+	int marks = 0;
 
 	printf("\n\n");
 	printf("Initial Values\t\t\t\tpc\tbp\tsp\n");
@@ -84,21 +83,21 @@ int main () {
 			return 1;
 		}
 
-		// Execute Cylce
+		// Execute Cycle
 		printf("%d\t", pc-1);
 		if (execute_Cycle(ir, stack, rf, &bp, &sp, &pc, &halt, &call)) {
 			printf("Error in Fetch Cycle...Aborting! \n");
 			return 1;
 		}
 
-		// Mark between frame calls 
+		// Mark between Activation Records
 		if (call == 1)
-			mark[i++] = bp;
+			mark[marks++] = bp;
 		else if (call == 2) {
-			mark[i--] = 0;
+			mark[marks--] = 0;
 		}
 
-		// Printing the Stack
+		// Stack Trace
 		printf("Stack:\t");
 		int j = 0;
 		for (int i = 0 ; i <= sp ; i++) {
@@ -107,14 +106,6 @@ int main () {
 				printf("| ");
 			}
 			printf("%d ", stack[i]);
-		}
-		printf("\n");
-
-		printf("Mark: \t");
-		for (int i = 0 ; i < MAX_LEXI_LEVELS ; i ++) {
-			if (mark[i] == 0)
-				break;
-			printf("%d ",mark[i]);
 		}
 		printf("\n");
 
@@ -330,12 +321,14 @@ int execute_Cycle (instruction ir, int *stack, int *rf, int *bp, int *sp, int *p
 	}
 
 	printf("%d\t%d\t%d\t%d\t%d\t%d\t\n", ir.r, ir.l, ir.m, *pc, *bp, *sp);
+
+	// Standard Input/Output
 	if (sio == 1)
 		printf("Register: %d\n", rf[ir.r]);
 	else if (sio ==2)
 		scanf("%d", &rf[ir.r]);
 
-
+	// CPU Trace
 	printf("CPU:\t");
 	for (int i = 0 ; i < 16 ; i ++)
 		printf("%d ", rf[i]);
@@ -347,7 +340,7 @@ int execute_Cycle (instruction ir, int *stack, int *rf, int *bp, int *sp, int *p
 
 void output_Instruction ( instruction *code, int instructions ) {
 	int i;
-	printf("Line\tOP\tR\tL\tM\n");
+	printf("\nLine\tOP\tR\tL\tM\n");
 
 	for ( i = 0 ; i < instructions ; i ++ ) {
 		printf("%d\t",i);
