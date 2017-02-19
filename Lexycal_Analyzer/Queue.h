@@ -11,8 +11,8 @@
 #include <stdlib.h>
 
 
-#ifndef TEST_H
-#define TEST_H
+#ifndef QUEUE_H
+#define QUEUE_H
 
 typedef enum { 
 	nulsym = 1, identsym, numbersym, plussym, minussym,
@@ -43,9 +43,13 @@ typedef struct node {
 	struct node* next;
 } node;
 
-void initQueue (node *head);
-node* addQueue ( token value, node *head );
-token popQueue ( node* head );
+typedef struct queue {
+	node* head;
+	node* tail;
+	
+} queue;
+
+queue* addQueue ( token value, queue *q );
 
 #endif
 

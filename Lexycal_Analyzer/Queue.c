@@ -6,28 +6,25 @@
 
 #include "Queue.h" 
 
-// Function to initialize the node
-void initQueue (node *head) {
-	head = NULL;
-}
 
 // Function to add to the stack
-node* addQueue ( token value, node *head ) {
+queue* addQueue ( token value, queue *q ) {
+
 	node* newToken = NULL;
 	newToken = (node *) malloc(sizeof(node));
-
-	newToken->next = head;
 	newToken->value = value;
-	head = newToken;
+	newToken->next = NULL;
 
-	return head;
+	if ( q->head == NULL ) {
+		q->head = newToken;
+		q->tail = newToken;
+	}
+	else {
+		q->tail->next = newToken;
+		q->tail = newToken;
+	}
+
+	return q;
 }
 
-// Function to pop from the stack
-token popQueue ( node* head ) {
-	token result = head->value;
-	node* trash = head;
-	head = head->next;
-	free(trash);
-	return result;
-}
+// Function to pop from the stack will be develop in parser

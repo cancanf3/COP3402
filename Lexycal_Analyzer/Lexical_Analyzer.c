@@ -9,11 +9,15 @@
 
 
 void clean_buffer (char* word);
-void outputTable (node* lexeme_list);
+void outputTable (queue* lexeme_list);
+void outputList (queue* lexeme_list);
 int issymbol (char letter);
+
 int main () {
 
-	node* lexeme_list = NULL;
+	queue* lexeme_list = (queue *)malloc(sizeof(queue));
+	lexeme_list->head = NULL;
+	lexeme_list->tail = NULL;
 	char lector;
 	char word[11];
 	int counter;
@@ -22,14 +26,14 @@ int main () {
 
 
 	// Open the file
-	//char name[100];
-	//printf("select the input file: ");
-	//scanf("%s", name);
-	code = fopen("input.txt", "r");
+	char name[100];
+	printf("select the input file: ");
+	scanf("%s", name);
+	code = fopen(name, "r");
 
+	// Avoiding previous trash in memory
 	clean_buffer(word);
 
-	// Initializing the lector
 	while (fscanf(code, "%c", &lector) != EOF ) {	
 			
 		counter = 0;
@@ -89,6 +93,8 @@ int main () {
 						strcpy(keyword.value, word);
 						lexeme_list = addQueue(keyword,lexeme_list);
 					}
+					else
+						goto IDE;
 					break;
 
 				case 3:
@@ -119,6 +125,8 @@ int main () {
 						strcpy(condition.value, word);
 						lexeme_list = addQueue(condition,lexeme_list);
 					}
+					else
+						goto IDE;
 					break;
 
 				case 4:
@@ -163,6 +171,8 @@ int main () {
 						strcpy(keyword.value, word);
 						lexeme_list = addQueue(keyword,lexeme_list);
 					}
+					else
+						goto IDE;
 					break;
 
 				case 5:
@@ -199,6 +209,8 @@ int main () {
 						strcpy(keyword.value, word);
 						lexeme_list = addQueue(keyword,lexeme_list);
 					}
+					else
+						goto IDE;
 					break;
 
 				case 9:
@@ -211,9 +223,11 @@ int main () {
 						strcpy(keyword.value, word);
 						lexeme_list = addQueue(keyword,lexeme_list);
 					}
+					else
+						goto IDE;
 					break;
 
-				default:
+				IDE:default:
 					// identifier
 					if (counter == 12)
 						counter = isKeyword;
@@ -292,7 +306,7 @@ int main () {
 			if (lector == ':') {
 				fscanf(code, "%c", &lector);
 				if (lector != '=') {
-					printf("Unkown Symbol :\n");
+					printf("Unkown Symbol \n");
 					return 1;
 				}
 				word[counter] = lector;
@@ -446,6 +460,12 @@ int main () {
 
 
 		}
+		// Unkown Characters
+		else {
+			printf("Unkown Character\n");
+			return 1;
+		}
+
 
 		// Cleaning Buffer;
 		clean_buffer(word);
@@ -455,23 +475,45 @@ int main () {
 	// Printing the Table
 	outputTable(lexeme_list);
 
+	// Printing the List
+	outputList(lexeme_list);
+
 	// Freeing the Queue
-	while (lexeme_list != NULL) {
-		node* aux = lexeme_list;
-		lexeme_list = lexeme_list->next;
-		free(aux);
+	node* aux = lexeme_list->head;
+	while (aux != NULL) {
+		node* freedom = aux;
+		aux = aux->next;
+		free(freedom);
 	}
+	free(lexeme_list);
 	return 0;
 
 }
 
-void outputTable (node* lexeme_list) {
+void outputTable (queue* lexeme_list) {
+	node* aux = lexeme_list->head;
 	printf("\nLexeme Table: \n");
-	printf("Lexeme\t\tToken Type\n");
-	while (lexeme_list != NULL) {
-		printf("%s\t\t\t%c%c\n", lexeme_list->value.value, lexeme_list->value.tokenNum[0], lexeme_list->value.tokenNum[1]);
-		lexeme_list = lexeme_list->next;
+	printf("Lexeme\t\t\tToken Type\n");
+	while (aux != NULL) {
+		printf("%s\t\t\t%c%c\n", aux->value.value, aux->value.tokenNum[0], aux->value.tokenNum[1]);
+		aux = aux->next;
 	}
+}
+
+void outputList (queue* lexeme_list) {
+	node* aux = lexeme_list->head;
+	printf("\nLexeme List: \n");
+	while (aux != NULL) {
+		if ((aux->value.tokenNum[0] == '2' || aux->value.tokenNum[0] == '3') && aux->value.tokenNum[1] == '\0')
+			printf(" %c%c %s ", aux->value.tokenNum[0], aux->value.tokenNum[1], aux->value.value);
+		else
+			printf(" %c%c ", aux->value.tokenNum[0], aux->value.tokenNum[1]);
+		aux = aux->next;
+		if (aux != NULL)
+			printf("|");
+	}
+	printf("\n");
+
 }
 
 void clean_buffer (char* word) {

@@ -1,0 +1,10 @@
+How to run The Lexer: 
+
+$ gcc gcc Lexical_Analyzer.c Queue.c
+
+$ ./a.out
+
+The program will request the name of the text file (the text file must be in the same folder and the name cannot be greater than 100 chars). 
+
+(..select the input file: input.txt..)
+
