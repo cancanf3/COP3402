@@ -1,18 +1,16 @@
 /* Author: Jose Pena
  * UCFID: 4142431
- * Tittle: Queue header (Lexer)
+ * Tittle: Queue header
  * Class: COP3402
  */
 
+#ifndef QUEUE_H
+#define QUEUE_H
 
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-
-
-#ifndef QUEUE_H
-#define QUEUE_H
 
 typedef enum { 
 	nulsym = 1, identsym, numbersym, plussym, minussym,
@@ -50,6 +48,7 @@ typedef struct queue {
 } queue;
 
 queue* addQueue ( token value, queue *q );
+token deQueue ( queue* q );
 
 #endif
 

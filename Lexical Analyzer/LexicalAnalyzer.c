@@ -4,16 +4,9 @@
  * Class: COP3402
  */
 
-#include "Queue.h"
+#include "LexicalAnalyzer.h"
 
-
-
-void clean_buffer (char* word);
-void outputTable (queue* lexeme_list);
-void outputList (queue* lexeme_list);
-int issymbol (char letter);
-
-int main () {
+queue* LexicalAnalyzer ( int flag ) {
 
 	queue* lexeme_list = (queue *)malloc(sizeof(queue));
 	lexeme_list->head = NULL;
@@ -37,7 +30,7 @@ int main () {
 	while (fscanf(code, "%c", &lector) != EOF ) {	
 			
 		counter = 0;
-		// Ignoring Charaters 
+		// Ignoring invisible Charaters 
 		if (lector == 10 || lector == 32 || lector == 9)
 			continue;
 
@@ -55,7 +48,7 @@ int main () {
 
 				if (counter > 11) {
 					printf("Exceed identifier name size limit\n");
-					return 1;
+					return NULL;
 				}
 
 				fscanf(code, "%c", &lector);
@@ -74,6 +67,7 @@ int main () {
 				counter = 12;
 
 			}
+			// A switch to improve the comparing.
 			switch (counter) {
 				case 2:
 					// if, do
@@ -218,7 +212,7 @@ int main () {
 					if (strcmp(word, "procedure") == 0) {
 						token keyword;
 						keyword.tokenNum[0] = '3';
-						keyword.tokenNum[0] = '0';
+						keyword.tokenNum[1] = '0';
 						keyword.tokenType = procsym;
 						strcpy(keyword.value, word);
 						lexeme_list = addQueue(keyword,lexeme_list);
@@ -251,7 +245,7 @@ int main () {
 
 				if (counter > 5) {
 					printf("Exceed number size limit\n");
-					return 1;
+					return NULL;
 				}
 
 				fscanf(code, "%c", &lector);
@@ -307,7 +301,7 @@ int main () {
 				fscanf(code, "%c", &lector);
 				if (lector != '=') {
 					printf("Unkown Symbol \n");
-					return 1;
+					return NULL;
 				}
 				word[counter] = lector;
 				counter++;
@@ -463,7 +457,7 @@ int main () {
 		// Unkown Characters
 		else {
 			printf("Unkown Character\n");
-			return 1;
+			return NULL;
 		}
 
 
@@ -471,22 +465,25 @@ int main () {
 		clean_buffer(word);
 
 	}
+
+	// Closing the Input File
 	fclose(code);
-	// Printing the Table
-	outputTable(lexeme_list);
+	if (flag) { 
+		// Printing the Table
+		outputTable(lexeme_list);
 
-	// Printing the List
-	outputList(lexeme_list);
-
-	// Freeing the Queue
-	node* aux = lexeme_list->head;
-	while (aux != NULL) {
-		node* freedom = aux;
-		aux = aux->next;
-		free(freedom);
+		// Printing the List
+		outputList(lexeme_list);
 	}
-	free(lexeme_list);
-	return 0;
+	// // Freeing the Queue
+	// node* aux = lexeme_list->head;
+	// while (aux != NULL) {
+	// 	node* freedom = aux;
+	// 	aux = aux->next;
+	// 	free(freedom);
+	// }
+	// free(lexeme_list);
+	return lexeme_list;
 
 }
 

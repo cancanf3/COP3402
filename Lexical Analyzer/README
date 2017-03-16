@@ -1,6 +1,6 @@
 How to run The Lexer: 
 
-$ gcc gcc Lexical_Analyzer.c Queue.c
+$ gcc Lexical_Analyzer.c Queue.c
 
 $ ./a.out
 

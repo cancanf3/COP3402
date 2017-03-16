@@ -134,7 +134,8 @@ int load_Instruction ( instruction *code ) {
 }
 
 int base ( int l, int base, int *stack ) {
-	int b1; //find base L levels down
+	int b1; //find base L levels 
+	down
 	b1 = base;
 
 	while (l > 0) {

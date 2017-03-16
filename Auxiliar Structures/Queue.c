@@ -7,7 +7,7 @@
 #include "Queue.h" 
 
 
-// Function to add to the stack
+// Function to add to the queue
 queue* addQueue ( token value, queue *q ) {
 
 	node* newToken = NULL;
@@ -27,4 +27,18 @@ queue* addQueue ( token value, queue *q ) {
 	return q;
 }
 
-// Function to pop from the stack will be develop in parser
+// Function to DeQueue from the queue
+token deQueue ( queue* q ) {
+	if (q->head == NULL) {
+		printf("Queue Empty\n");
+		exit(EXIT_FAILURE);
+	}
+
+	token result = q->head->value;
+	node* freeButterfly = q->head;
+	q->head = q->head->next;
+	free(freeButterfly);
+	printf("Token: %s\n", result.value);
+	return result;
+
+}
