@@ -6,12 +6,27 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "./Lexical Analyzer/LexicalAnalyzer.h"
 #include "./Parser/Parser.h"
-
+#include "./Code Generator/CodeGenerator.h" 
+#include "./Virtual Machine/VirtualMachine.h"
 int main (int argc, char* argv[]) {
 
+	// Auxiliary Structures
 	queue* tokens;
+	hashTable* hashy;
+	instruction code;
+	stack* regis = createStack();
+	code.codeSize = 0;
+	for ( int i = 0 ; i < MAX_CODE_LENGTH ; i ++) {
+		code.mem[i].op = 0;
+		code.mem[i].r = 0;
+		code.mem[i].l = 0;
+		code.mem[i].m = 0;
+	}
+
+	// Flags to output
 	int lFlag = 0;
 	int aFlag = 0;
 	int vFlag = 0;
@@ -36,23 +51,37 @@ int main (int argc, char* argv[]) {
 		}
 	}
 
-
+	// Lexer
 	tokens = LexicalAnalyzer(lFlag);
 	if (tokens == NULL) {
 		printf("Error in the Lexer\n");
 		return 1;
 	}
 
-	program(tokens);
+	// Symbol Table
+	hashy = createHashTable();
+
+	// Parser and Generating Code
+	program(tokens, hashy, regis, &code);
+	if(aFlag) {
+		printf("\n\n\nAssembly Code Generated: \n");
+		for (int i = 0; i < code.codeSize ; i++)
+			printf("OP: %d R:%d L:%d M:%d \n", code.mem[i].op,code.mem[i].r,code.mem[i].l,code.mem[i].m);
+	}
+
+	//Virtual Machine
+	VirtualMachine(vFlag, &code);
+
 
 	// Freeing the Queue
-	node* aux = tokens->head;
-	while (aux != NULL) {
-		node* freedom = aux;
-		aux = aux->next;
-		free(freedom);
-	}
 	free(tokens);
+
+	// Freeing the HashTable
+	free(hashy);
+	// Freeing the Stack
+	while (regis->head != NULL)
+		popStack(regis);
+	free(regis);
 
 
 }

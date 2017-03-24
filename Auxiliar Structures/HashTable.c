@@ -16,6 +16,26 @@ hashTable* createHashTable () {
 	return hashy;
 }
 
+int toInt ( char *number ) {
+	int result = 0; 
+	int i;
+	int size = 0;
+	for ( i = 0 ; i < 6 ; i ++ )
+		if (number[i] != '\0')
+			size++;
+
+
+	for ( i = 0; i < size; i++ )
+		if ( i == 0 )
+			result += number[size-1]-48;
+		else 
+			result += (number[size-i-1]-48)*(10*i);
+
+	printf("toInt: %d\n", result);
+	return result;
+
+}
+
 void destroyHashTable ( hashTable* hashy ) {
 	free(hashy);
 }

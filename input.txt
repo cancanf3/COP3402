@@ -1,5 +1,13 @@
+const a = 1;
 var x, y;
 begin	
-  x := y + 56;
+
+	y := 0;
+
+	while y < 10 do begin
+		x := x + 10;
+		y := a + y;
+	end;
+
 end.
 

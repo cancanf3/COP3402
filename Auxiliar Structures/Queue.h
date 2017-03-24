@@ -4,8 +4,8 @@
  * Class: COP3402
  */
 
-#ifndef QUEUE_H
-#define QUEUE_H
+#ifndef QUEUE
+#define QUEUE
 
 #include <stdio.h>
 #include <ctype.h>
@@ -29,12 +29,6 @@ typedef struct {
 
 } token;
 
-typedef struct {
-	int kind;
-	char name[10]; int val;
-	int level;
-	int addr;
-} symbol;
 
 typedef struct node {
 	token value;
