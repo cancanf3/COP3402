@@ -15,7 +15,6 @@ int main (int argc, char* argv[]) {
 
 	// Auxiliary Structures
 	queue* tokens;
-	hashTable* hashy;
 	instruction code;
 	stack* regis = createStack();
 	code.codeSize = 0;
@@ -58,17 +57,14 @@ int main (int argc, char* argv[]) {
 		return 1;
 	}
 
-	// Symbol Table
-	hashy = createHashTable();
 
 	// Parser and Generating Code
-	program(tokens, hashy, regis, &code);
+	program(tokens, regis, &code);
 	if(aFlag) {
 		printf("\n\n\nAssembly Code Generated: \n");
 		for (int i = 0; i < code.codeSize ; i++)
-			printf("OP: %d R:%d L:%d M:%d \n", code.mem[i].op,code.mem[i].r,code.mem[i].l,code.mem[i].m);
+			printf(" %d: OP: %d R:%d L:%d M:%d \n",i,code.mem[i].op,code.mem[i].r,code.mem[i].l,code.mem[i].m);
 	}
-
 	//Virtual Machine
 	VirtualMachine(vFlag, &code);
 
@@ -76,8 +72,6 @@ int main (int argc, char* argv[]) {
 	// Freeing the Queue
 	free(tokens);
 
-	// Freeing the HashTable
-	free(hashy);
 	// Freeing the Stack
 	while (regis->head != NULL)
 		popStack(regis);

@@ -15,6 +15,7 @@ typedef struct {
 } symbol, hashTable; 
 
 hashTable* createHashTable ();
+hashTable* copyHashTable ( hashTable *original );
 int toInt ( char *number );
 int hashFunction ( char* identifier );
 symbol* lookup ( char* identifier,int level , hashTable* hashy );

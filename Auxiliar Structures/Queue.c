@@ -38,7 +38,6 @@ token deQueue ( queue* q ) {
 	node* freeButterfly = q->head;
 	q->head = q->head->next;
 	free(freeButterfly);
-	printf("Token: %s\n", result.value);
 	return result;
 
 }

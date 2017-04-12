@@ -6,24 +6,35 @@
 
 
 #include "Parser.h"
+int actualLevel = 0;
 
-void program ( queue* q, hashTable* h, stack* stacky,instruction* code) {
-	block(q,h, stacky,code);
+
+void program ( queue* q, stack* stacky,instruction* code) {
+
+	hashTable* hashy = createHashTable();
+	gen(6,0,3,stacky, code);
+	block(q,hashy, stacky,code);
 	// Terminal Period
 	token t = deQueue(q);
 	if ( t.tokenType !=  periodsym)
 		error(9);
 
 	gen(11,0,0, stacky,code);
+
+	// Freeing the HashTable
+	free(hashy);
 }
 
 void block ( queue* q, hashTable* h, stack* stacky,instruction* code) {
-	int addressPosition = 0;
+	int addressPosition;
+	if (code->codeSize == 0 )
+		addressPosition = 0;
+	else
+		addressPosition = 4;
 
 	constDeclaration(q,h, stacky,code);
 	varDeclaration(q,h,&addressPosition, stacky,code);
 	procDeclaration(q,h, stacky,code);
-
 	statement(q,h, stacky,code);
 }
 
@@ -73,6 +84,7 @@ void constDeclaration ( queue* q, hashTable* h , stack* stacky,instruction* code
 void varDeclaration ( queue* q, hashTable* h, int* addressPosition, stack* stacky,instruction* code) {
 	token t;
 	symbol s;
+	int i = 0;
 	if ( q->head->value.tokenType != varsym )
 		return;
 
@@ -93,6 +105,7 @@ void varDeclaration ( queue* q, hashTable* h, int* addressPosition, stack* stack
 		s.addr = *addressPosition;
 		(*addressPosition)++;
 		insert(s, h);
+		i++;
 
 	} while ( q->head->value.tokenType == commasym );
 
@@ -100,37 +113,50 @@ void varDeclaration ( queue* q, hashTable* h, int* addressPosition, stack* stack
 	t = deQueue(q);
 	if ( t.tokenType != semicolonsym )
 		error(5);
-	gen(6,0,*addressPosition,stacky, code);
+	gen(6,0,i,stacky, code);
 }
 
 void procDeclaration ( queue* q, hashTable* h, stack* stacky,instruction* code) {
-	
-	if ( q->head->value.tokenType == procsym ) {
 
-			// Terminal Procedure
-			token t = deQueue(q);
+	while ( q->head->value.tokenType == procsym ) {
+		token t;
+		symbol s;
+		int temp = code->codeSize;
+		gen(7,0,0, stacky,code);
 
-			// Terminal Identifier
-			t = deQueue(q);
-			if ( t.tokenType != identsym )
-				error(4);
+		// Terminal Procedure
+		t = deQueue(q);
 
-			// Terminal Semicolon
-			t = deQueue(q);
-			if ( t.tokenType != semicolonsym )
-				error(5);
+		// Terminal Identifier
+		t = deQueue(q);
+		if ( t.tokenType != identsym )
+			error(4);
 
-			block(q,h, stacky,code);
+		// Adding a Symbol to the table
+		s.kind = 3;
+		strcpy(s.name, t.value);
+		s.level = actualLevel++;
+		s.addr = code->codeSize;
+		insert(s, h);
+		hashTable* copy;
+		copy = copyHashTable(h);
 
-			// Terminal Semicolon
-			t = deQueue(q);
-			if ( t.tokenType != semicolonsym )
-				error(5);
+		// Terminal Semicolon
+		t = deQueue(q);
+		if ( t.tokenType != semicolonsym )
+			error(5);
+		gen(6,0,4,stacky, code);
+		block(q,copy, stacky,code);
+		gen(2,0,0, stacky, code);
+		// Terminal Semicolon
+		t = deQueue(q);
+		if ( t.tokenType != semicolonsym )
+			error(5);
 
-			procDeclaration(q,h, stacky,code);
+		actualLevel--;
+		free(copy);
+		code->mem[temp].m = code->codeSize;
 	}
-	statement(q,h, stacky,code);
-
 
 }
 
@@ -142,7 +168,11 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code) {
 		t = deQueue(q);
 
 		//Checking if exist in the symbol table
-		s = lookup(t.value,0,h);
+		s = NULL;
+		int i = actualLevel;
+		while ( s == NULL && i != -1 )
+			s = lookup(t.value,i--,h);
+
 		if ( s == NULL )
 			error(11);
 
@@ -154,9 +184,7 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code) {
 		t = deQueue(q);
 		if ( t.tokenType != becomessym )
 			error(3);
-
 		expression(q,h, stacky,code);
-
 		//Generating Code
 		gen(04,s->level,s->addr, stacky,code);
 
@@ -168,11 +196,24 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code) {
 		t = deQueue(q);
 		if ( t.tokenType != identsym )
 			error(14);
+		s = NULL;
+		int i = actualLevel;
+		while ( s == NULL && i != -1 )
+			s = lookup(t.value,i--,h);
+
+		if ( s == NULL )
+			error(11);
+
+		if (s->kind != 3)
+			error(26);
+
+		printf("actual: %d  lvl de la funcion: %d name de la func: %s \n",actualLevel ,s->level, s->name );
+		gen(5,actualLevel - s->level, s->addr, stacky, code);
 
 
 	} // Terminal if
 	else if ( q->head->value.tokenType == ifsym ){
-		int ctemp;
+		int ctemp, ctemp1;
 		t = deQueue(q);
 
 		condition(q,h, stacky,code);
@@ -185,7 +226,17 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code) {
 		ctemp = code->codeSize;
 		gen(8,0,0, stacky,code);
 		statement(q,h, stacky,code);
-		code->mem[ctemp].m = code->codeSize;
+		ctemp1 = code->codeSize;
+		// Terminal Else
+		if ( q->head->value.tokenType == elsesym ) {
+			gen(7,0,0, stacky,code);
+			code->mem[ctemp].m = code->codeSize;
+			t = deQueue(q);
+			statement(q,h, stacky,code);
+			code->mem[ctemp1].m = code->codeSize;
+		}
+		else
+			code->mem[ctemp].m = code->codeSize;
 	} // Terminal While
 	else if ( q->head->value.tokenType == whilesym ) {
 		int cx1 = code->codeSize;
@@ -212,7 +263,10 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code) {
 		t = deQueue(q);
 		if ( t.tokenType != identsym )
 			error(29);
-		s = lookup(t.value,0,h);
+				s = NULL;
+		int i = actualLevel;
+		while ( s == NULL && i != -1 )
+			s = lookup(t.value,i--,h);
 		gen(03,s->level,s->addr, stacky,code);
 		gen(10,0,0,stacky, code);
 
@@ -225,7 +279,10 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code) {
 		if ( t.tokenType != identsym )
 			error(29);
 
-		s = lookup(t.value,0,h);
+		s = NULL;
+		int i = actualLevel;
+		while ( s == NULL && i != -1 )
+			s = lookup(t.value,i--,h);
 		gen(9,0,0,stacky, code);
 		gen(04,s->level,s->addr, stacky,code);
 
@@ -252,7 +309,7 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code) {
 
 void condition (queue *q, hashTable* h, stack* stacky,instruction* code) {
 	token t;
-
+	printf("llega aca\n");
 	// Terminal odd
 	if ( q->head->value.tokenType == oddsym ) {
 		t = deQueue(q);
@@ -265,7 +322,7 @@ void condition (queue *q, hashTable* h, stack* stacky,instruction* code) {
 		if ( t.tokenType != eqlsym && t.tokenType != neqsym &&
 			t.tokenType != lessym && t.tokenType != leqsym &&
 			t.tokenType != gtrsym && t.tokenType != geqsym )
-			error(30);;
+			error(30);
 
 		expression(q,h, stacky,code);
 
@@ -340,7 +397,12 @@ void factor (queue* q, hashTable* h, stack* stacky,instruction* code) {
 	// Identifier
 	if (q->head->value.tokenType == identsym ) {
 		t = deQueue(q);
-		s = lookup(t.value,0,h);
+		s = NULL;
+		int i = actualLevel;
+		while ( s == NULL && i != -1 ) {
+			s = lookup(t.value,i--,h);
+			printf("pegadooo\n");
+		}
 		if ( s == NULL )
 			exit(11);
 		if (s->kind == 2)

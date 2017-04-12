@@ -23,7 +23,7 @@ void VirtualMachine ( int flag, instruction *code) {
 
 
 	// Initialization 
-	bp = 1;
+	bp = 0;
 	sp = 0;
 	pc = 0;
 	ir.op = 0;

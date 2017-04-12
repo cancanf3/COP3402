@@ -1,13 +1,14 @@
-const a = 1;
-var x, y;
-begin	
-
-	y := 0;
-
-	while y < 10 do begin
-		x := x + 10;
-		y := a + y;
+var x;
+procedure a;
+	begin
+		if 10 > x then
+		begin
+			x := x + 2;
+			call a
+		end
 	end;
-
+begin
+	x := 1;
+	call a
 end.
 

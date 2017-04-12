@@ -17,7 +17,7 @@
 #include "../Code Generator/CodeGenerator.h"
 
 
-void program ( queue* q, hashTable* h, stack* stacky,instruction* code);
+void program ( queue* q, stack* stacky,instruction* code);
 void block ( queue* q, hashTable* h, stack* stacky,instruction* code);
 void constDeclaration ( queue* q, hashTable* h, stack* stacky,instruction* code);
 void varDeclaration ( queue* q, hashTable* h, int* addressPosition, stack* stacky,instruction* code);
@@ -28,5 +28,6 @@ void expression ( queue* q, hashTable* h, stack* stacky,instruction* code);
 void term ( queue* q, hashTable* h, stack* stacky,instruction* code);
 void factor (queue* q, hashTable* h, stack* stacky,instruction* code);
 void error ( int number );
+
 
 #endif  

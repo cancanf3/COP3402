@@ -36,6 +36,9 @@ void gen(int opr, int l, int m, stack* s, instruction* code) {
 
 			case 05:
 				// CAL
+				code->mem[code->codeSize].op = opr;
+				code->mem[code->codeSize].m = m;
+				code->mem[code->codeSize].l = l;
 				break;
 
 			case 06:

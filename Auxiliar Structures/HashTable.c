@@ -16,6 +16,17 @@ hashTable* createHashTable () {
 	return hashy;
 }
 
+hashTable* copyHashTable ( hashTable *original ) {
+	int i;
+	hashTable *hashy = (hashTable *) malloc(sizeof(hashTable)*SIZE);
+	for (i = 0; i < SIZE ; i++){
+		hashy[i] = original[i];
+		if (hashy[i].kind != 3)
+			hashy[i].level++;
+	} 
+	return hashy;
+}
+
 int toInt ( char *number ) {
 	int result = 0; 
 	int i;
@@ -72,6 +83,7 @@ symbol* lookup ( char* identifier,int level, hashTable* hashy ) {
 
 // insert in the Hash Table
 void insert ( symbol s , hashTable* hashy ) {
+	printf("inserto %s en lvl %d tipo %d\n",s.name, s.level, s.kind );
 	int i = 0;
 	int hashCode = hashFunction(s.name);
 	if ( *(hashy[hashCode%SIZE].name) == '\0' && *(hashy[hashCode%SIZE].name) != '\a') {

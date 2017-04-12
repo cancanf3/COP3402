@@ -1,8 +1,8 @@
-How to run The Lexer: 
+How to run The Virtual Machine: 
 
-$ gcc Lexical_Analyzer.c Queue.c
+$ make
 
-$ ./a.out
+$ pcc Usage: %s [-l Tokens] [-a Assembly Code] [-v stack & cpu trace]
 
 The program will request the name of the text file (the text file must be in the same folder and the name cannot be greater than 100 chars). 
 
