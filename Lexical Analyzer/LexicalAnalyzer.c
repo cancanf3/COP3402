@@ -19,10 +19,10 @@ queue* LexicalAnalyzer ( int flag ) {
 
 
 	// Open the file
-	char name[100];
-	printf("select the input file: ");
-	scanf("%s", name);
-	code = fopen(name, "r");
+	// char name[100];
+	// printf("select the input file: ");
+	// scanf("%s", name);
+	code = fopen("input.txt", "r");
 
 	// Avoiding previous trash in memory
 	clean_buffer(word);

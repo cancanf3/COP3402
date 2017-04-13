@@ -42,7 +42,6 @@ int toInt ( char *number ) {
 		else 
 			result += (number[size-i-1]-48)*(10*i);
 
-	printf("toInt: %d\n", result);
 	return result;
 
 }
@@ -83,7 +82,6 @@ symbol* lookup ( char* identifier,int level, hashTable* hashy ) {
 
 // insert in the Hash Table
 void insert ( symbol s , hashTable* hashy ) {
-	printf("inserto %s en lvl %d tipo %d\n",s.name, s.level, s.kind );
 	int i = 0;
 	int hashCode = hashFunction(s.name);
 	if ( *(hashy[hashCode%SIZE].name) == '\0' && *(hashy[hashCode%SIZE].name) != '\a') {

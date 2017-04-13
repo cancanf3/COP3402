@@ -1,14 +1,30 @@
 var x;
 procedure a;
-	begin
-		if 10 > x then
+	var y;
+	procedure b;
+		var z;
+		procedure d;
+			var rat;
+			begin
+				x := 33;
+			end;
 		begin
-			x := x + 2;
-			call a
-		end
+			x := 5
+			z := 69;
+			call d;
+		end;
+	begin
+		y := 4;
+		x := 2;
+		call b;
 	end;
 begin
-	x := 1;
-	call a
+	x := 3;
+	if odd x then 
+		x := x * 3
+	else
+		x := x * 4;
+	call a;
+	x := 13;
 end.
 
