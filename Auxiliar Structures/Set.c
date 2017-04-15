@@ -5,7 +5,7 @@
  */
 
 #include "Set.h"
-
+// Create an empty set
 setsym* createSet() {
 	setsym* s = (setsym*)malloc(sizeof(setsym));
 	s->size = 0;
@@ -14,7 +14,7 @@ setsym* createSet() {
 		s->set[i] = nulsym;
 	return s; 
 }
-
+// make a copycat of a set
 setsym copySet(setsym* s) {
 	setsym result;
 	result.size = s->size;
@@ -23,7 +23,7 @@ setsym copySet(setsym* s) {
 		result.set[i] = s->set[i];
 	return result;
 }
-
+// Add an element to the set
 void addElement ( token_type t, setsym* s) {
 	if ( s->size == 32)
 		return;
@@ -34,7 +34,7 @@ void addElement ( token_type t, setsym* s) {
 	}
 	s->set[s->size++] = t;
 }
-
+// Check if a element is in the set
 int existElement ( token_type t, setsym s) {
 	int i;
 	for ( i = 0 ; i < s.size ; i++) {
@@ -43,7 +43,7 @@ int existElement ( token_type t, setsym s) {
 	}
 	return 0;
 }
-
+// Union of two sets
 setsym mergeSet (setsym s1, setsym s2) {
 	setsym* placeHolder = createSet();
 	int i;
@@ -65,4 +65,22 @@ setsym mergeSet (setsym s1, setsym s2) {
 	setsym result = *placeHolder;
 	free(placeHolder);
 	return result;
+}
+// Generated prefixed set following the grammar of PL/0
+setsym preGenerated (char * nonTerminal) {
+	setsym *fsys = createSet();
+
+	if (strcmp(nonTerminal, "block") == 0) {
+		addElement(constsym, fsys);
+		addElement(procsym, fsys);
+		addElement(identsym, fsys);
+		addElement(ifsym, fsys);
+		addElement(callsym, fsys);
+		addElement(beginsym, fsys);
+		addElement(whilesym, fsys);
+	}
+	setsym result = copySet(fsys);
+	free(fsys);
+	return result;
+
 }

@@ -12,6 +12,10 @@ hashTable* createHashTable () {
 	hashTable *hashy = (hashTable *) malloc(sizeof(hashTable)*SIZE);
 	for (i = 0; i < SIZE ; i++){
 		*(hashy[i].name) = '\0';
+		hashy[i].kind = 0;
+		hashy[i].val = 0;
+		hashy[i].addr = 0;
+		hashy[i].level = 0;		
 	} 
 	return hashy;
 }

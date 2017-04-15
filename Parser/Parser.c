@@ -52,7 +52,8 @@ void program ( queue* q, stack* stacky,instruction* code ) {
 	free(statbegsys);
 	free(facbegsys);
 }
-
+// fsys { const, var, procedure, begin, call, if, while, . }
+// Proc fsys { const, var, procedure, begin, call, if, while, ., ; }
 void block ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsys) {
 	int addressPosition = 4;
 	setsym testset = copySet(statbegsys);
@@ -153,11 +154,13 @@ void varDeclaration ( queue* q, hashTable* h, int* addressPosition, stack* stack
 	gen(6,0,i,stacky, code);
 }
 
+// fsys { const, var, procedure, begin, call, if, while, . }
 void procDeclaration ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsys) {
 
 	while ( q->head->value.tokenType == procsym ) {
 		token t;
 		symbol s;
+		setsym aux = copySet(&fsys);
 		int temp = code->codeSize;
 		gen(7,0,0, stacky,code);
 
@@ -190,10 +193,14 @@ void procDeclaration ( queue* q, hashTable* h, stack* stacky,instruction* code, 
 		if (!existElement(q->head->value.tokenType, *declbegsys)) {
 			// Terminal Semicolon
 			t = deQueue(q);
-			if ( t.tokenType != semicolonsym ) {
-				printf("soy imbecil!!!!\n");
+			if ( t.tokenType != semicolonsym )
 				error(0,5);
+			else {
+				addElement(identsym, &aux);
+				addElement(procsym, &aux);
+				test(*statbegsys, aux, 6, q);
 			}
+
 		}
 
 		actualLevel--;
@@ -203,6 +210,8 @@ void procDeclaration ( queue* q, hashTable* h, stack* stacky,instruction* code, 
 
 }
 
+// fsys { const, var, procedure, begin, call, if, while, ., ; }
+//if fsys { const, var, procedure, begin, call, if, else, while, ., ; }
 void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsys) {
 	token t;
 	symbol* s;
@@ -221,8 +230,10 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 			error(0,11);
 
 		//Checking if it is a var 
-		if (s->kind != 2)
+		if (s->kind != 2) {
+			printf("its me mario!\n");
 			error(0,12);
+		}
 
 		// Terminal :=
 		t = deQueue(q);
@@ -251,7 +262,6 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 		if (s->kind != 3)
 			error(0,26);
 
-		printf("actual: %d  lvl de la funcion: %d name de la func: %s \n",actualLevel ,s->level, s->name );
 		gen(5,actualLevel - s->level, s->addr, stacky, code);
 
 
@@ -261,7 +271,6 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 		t = deQueue(q);
 		setsym testset = copySet(&fsys);
 		addElement(thensym, &testset);
-		addElement(dosym, &testset);
 		condition(q,h, stacky,code, testset);
 
 		// Terminal Then
@@ -271,7 +280,9 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 
 		ctemp = code->codeSize;
 		gen(8,0,0, stacky,code);
-		statement(q,h, stacky,code, fsys);
+		setsym testset1 = copySet(&fsys);
+		addElement(elsesym, &testset1);
+		statement(q,h, stacky,code, testset1);
 		ctemp1 = code->codeSize;
 		// Terminal Else
 		if ( q->head->value.tokenType == elsesym ) {
@@ -290,7 +301,7 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 		t = deQueue(q);
 		setsym testset = copySet(&fsys);
 		addElement(dosym,&testset);
-		condition(q,h, stacky,code, fsys);
+		condition(q,h, stacky,code, testset);
 
 		cx2 = code->codeSize;
 		gen(8,0,0, stacky,code);
@@ -344,6 +355,8 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 		// Terminal Semicolon
 		while ( existElement(q->head->value.tokenType, testset) ) {
 			t = deQueue(q);
+			if (t.tokenType != semicolonsym)
+				error(0,10);
 			statement(q,h, stacky,code, fsys);
 		}
 
@@ -358,7 +371,8 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 	free(testset);
 
 }
-
+// if fsys { const, var, procedure, begin, call, if, while, ., ;, then }
+// while fsys { const, var, procedure, begin, call, if, while, ., ;, do }
 void condition (queue *q, hashTable* h, stack* stacky,instruction* code, setsym fsys) {
 	token t;
 	// Terminal odd
@@ -368,6 +382,13 @@ void condition (queue *q, hashTable* h, stack* stacky,instruction* code, setsym 
 		gen(17,0,0, stacky,code);
 	}
 	else {
+		setsym testset = copySet(&fsys);
+		addElement(eqlsym,&fsys);
+		addElement(neqsym, &fsys);
+		addElement(lessym,&fsys);
+		addElement(gtrsym,&fsys);
+		addElement(leqsym, &fsys);
+		addElement(geqsym, &fsys);
 		expression(q,h, stacky,code, fsys);
 		t = deQueue(q);
 		if ( t.tokenType != eqlsym && t.tokenType != neqsym &&
@@ -375,7 +396,7 @@ void condition (queue *q, hashTable* h, stack* stacky,instruction* code, setsym 
 			t.tokenType != gtrsym && t.tokenType != geqsym )
 			error(0,30);
 
-		expression(q,h, stacky,code, fsys);
+		expression(q,h, stacky,code, testset);
 
 		// Generatin code for the conditional
 		if ( t.tokenType == eqlsym )
@@ -393,9 +414,13 @@ void condition (queue *q, hashTable* h, stack* stacky,instruction* code, setsym 
 	}
 }
 
-
+// Assigntment fsys { const, var, procedure, begin, call, if, while, ., ; }
+// if condition fsys { const, var, procedure, begin, call, if, while, ., ;, then } + { <, >, <=, >=, !=, ==}
+// while condition fsys { const, var, procedure, begin, call, if, while, ., ;, do } + { <, >, <=, >=, !=, ==}
 void expression ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsys) {
 	token t;
+	addElement(plussym, &fsys);
+	addElement(minussym, &fsys);
 	// Terminal + or -
 	if ( q->head->value.tokenType == plussym || q->head->value.tokenType == minussym) {
 		t = deQueue(q);
@@ -421,8 +446,14 @@ void expression ( queue* q, hashTable* h, stack* stacky,instruction* code, setsy
 	}
 }
 
+
+// Assigntment fsys { const, var, procedure, begin, call, if, while, ., ; } + { +, -}
+// if condition fsys { const, var, procedure, begin, call, if, while, ., ;, then } + { <, >, <=, >=, !=, ==} + {+, -}
+// while condition fsys { const, var, procedure, begin, call, if, while, ., ;, do } + { <, >, <=, >=, !=, ==} + {+, -}
 void term ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsys) {
 	token t;
+	addElement(multsym, &fsys);
+	addElement(slashsym, &fsys);
 	factor(q,h, stacky,code, fsys);
 	// Terminal * or /
 	while ( q->head->value.tokenType == multsym || q->head->value.tokenType == slashsym ) {
@@ -434,45 +465,54 @@ void term ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsys
 			gen(16,0,0, stacky,code);
 	}
 }
-
+// Assigntment fsys { const, var, procedure, begin, call, if, while, ., ; } + { +, -} + {*, /}
+// if condition fsys { const, var, procedure, begin, call, if, while, ., ;, then } + { <, >, <=, >=, !=, ==} + {+, -} + {*, /}
+// while condition fsys { const, var, procedure, begin, call, if, while, ., ;, do } + { <, >, <=, >=, !=, ==} + {+, -} + {*, /}
 void factor (queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsys) {
 	token t;
 	symbol* s;
-	// Identifier
-	if (q->head->value.tokenType == identsym ) {
-		t = deQueue(q);
-		s = NULL;
-		int i = actualLevel;
-		while ( s == NULL && i != -1 )
-			s = lookup(t.value,i--,h);
+	setsym testset = copySet(&fsys);
+	test(*facbegsys,fsys, 24, q);
+	while(existElement(q->head->value.tokenType, *facbegsys)) {
+		// Identifier
+		if (q->head->value.tokenType == identsym ) {
+			t = deQueue(q);
+			s = NULL;
+			int i = actualLevel;
+			while ( s == NULL && i != -1 )
+				s = lookup(t.value,i--,h);
 
-		if ( s == NULL )
-			exit(11);
-		if (s->kind == 2)
-			gen(03,s->level,s->addr, stacky,code);
-		else if (s->kind == 1)
-			gen(01, 0,s->val, stacky,code);
-		else
-			error(0,12);
-	}
-	// Terminal Number
-	else if (q->head->value.tokenType == numbersym ) {
-		t = deQueue(q);
-		gen(1, 0,atoi(t.value), stacky,code);
-	}
-	// Terminal (
-	else if (q->head->value.tokenType == lparentsym ) {
-		t = deQueue(q);
+			if ( s == NULL )
+				exit(11);
+			if (s->kind == 2)
+				gen(03,s->level,s->addr, stacky,code);
+			else if (s->kind == 1)
+				gen(01, 0,s->val, stacky,code);
+			else 
+				error(0,12);
+		}
+		// Terminal Number
+		else if (q->head->value.tokenType == numbersym ) {
+			t = deQueue(q);
+			gen(1, 0,atoi(t.value), stacky,code);
+		}
+		// Terminal (
+		else if (q->head->value.tokenType == lparentsym ) {
+			t = deQueue(q);
+			addElement(rparentsym, &fsys);
+			expression(q,h, stacky,code, fsys);
 
-		expression(q,h, stacky,code, fsys);
+			//Terminal )
+			t = deQueue(q);
+			if (t.tokenType != rparentsym)
+				error(0,31);
+		}
 
-		//Terminal )
-		t = deQueue(q);
-		if (t.tokenType != rparentsym)
-			error(0,31);
+		setsym *aux = createSet();
+		addElement(lparentsym, aux);
+		test(testset, *aux, 23, q);
+		free(aux);
 	}
-	else
-		error(0,24);
 
 }
 
@@ -584,13 +624,11 @@ void error ( int recovery, int number ) {
 }
 
 void test (setsym s1, setsym s2, int n, queue* q) {
-	printf("token: %s\n",q->head->value.value);
-	printf("existe en el conjunto: %d\n", existElement(q->head->value.tokenType, s1));
 	if ( existElement(q->head->value.tokenType, s1) != 1 ) {
 		error(1,n);
 		setsym s3 = mergeSet(s1,s2);
 		while ( existElement(q->head->value.tokenType, s3) != 1) {
-			printf("saco tokens: %s porque soy arrecho\n", q->head->value.value);
+			printf("Ignoring tokens: %s --Error Recovery\n", q->head->value.value);
 			deQueue(q);
 		}
 	}
