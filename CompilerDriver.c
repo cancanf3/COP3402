@@ -58,7 +58,7 @@ int main (int argc, char* argv[]) {
 	}
 
 
-	// Parser and Generating Code
+	// Parser and Generating Code (with Error Recovery)
 	program(tokens, regis, &code);
 	if(aFlag) {
 		printf("\n\n\nAssembly Code Generated: \n");

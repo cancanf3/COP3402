@@ -7,12 +7,10 @@ procedure a;
 	end;
 begin
 	x := 2;
-	if odd x then 
+	if odd  do
 		x := x * 3
-	else if x < 2 then
-		x := x * 4
 	else
-		call a;
+		call a
 
 end.
 

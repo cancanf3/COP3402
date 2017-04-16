@@ -31,14 +31,15 @@ queue* addQueue ( token value, queue *q ) {
 token deQueue ( queue* q ) {
 	if (q->head == NULL) {
 		printf("Queue Empty\n");
-		exit(EXIT_FAILURE);
+		token null;
+		null.tokenType = nulsym;
+		return null;
 	}
 
 	token result = q->head->value;
 	node* freeButterfly = q->head;
 	q->head = q->head->next;
 	free(freeButterfly);
-	// printf("Dtoken: %s\n", result.value);
 	return result;
 
 }

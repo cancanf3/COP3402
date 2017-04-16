@@ -7,6 +7,7 @@
 
 #include "Parser.h"
 int actualLevel = 0;
+int isCorrect = 0;
 setsym *declbegsys;
 setsym *statbegsys;
 setsym *facbegsys;
@@ -51,6 +52,10 @@ void program ( queue* q, stack* stacky,instruction* code ) {
 	free(declbegsys);
 	free(statbegsys);
 	free(facbegsys);
+
+	if (!isCorrect)
+		printf("\n\nThe Program is Syntactically Correct\n");
+
 }
 // fsys { const, var, procedure, begin, call, if, while, . }
 // Proc fsys { const, var, procedure, begin, call, if, while, ., ; }
@@ -230,10 +235,8 @@ void statement ( queue* q, hashTable* h, stack* stacky,instruction* code, setsym
 			error(0,11);
 
 		//Checking if it is a var 
-		if (s->kind != 2) {
-			printf("its me mario!\n");
+		if (s->kind != 2)
 			error(0,12);
-		}
 
 		// Terminal :=
 		t = deQueue(q);
@@ -518,6 +521,7 @@ void factor (queue* q, hashTable* h, stack* stacky,instruction* code, setsym fsy
 
 
 void error ( int recovery, int number ) {
+	isCorrect = 1;
 	switch (number) {
 		case 0:
 			printf("Const most be followoed by =\n");
@@ -624,11 +628,13 @@ void error ( int recovery, int number ) {
 }
 
 void test (setsym s1, setsym s2, int n, queue* q) {
+	if (q->head == NULL)
+		return;
 	if ( existElement(q->head->value.tokenType, s1) != 1 ) {
 		error(1,n);
 		setsym s3 = mergeSet(s1,s2);
 		while ( existElement(q->head->value.tokenType, s3) != 1) {
-			printf("Ignoring tokens: %s --Error Recovery\n", q->head->value.value);
+			printf("--Error Recovery: Ignoring token => %s\n", q->head->value.value);
 			deQueue(q);
 		}
 	}

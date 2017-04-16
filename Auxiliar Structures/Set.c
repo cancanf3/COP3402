@@ -66,21 +66,3 @@ setsym mergeSet (setsym s1, setsym s2) {
 	free(placeHolder);
 	return result;
 }
-// Generated prefixed set following the grammar of PL/0
-setsym preGenerated (char * nonTerminal) {
-	setsym *fsys = createSet();
-
-	if (strcmp(nonTerminal, "block") == 0) {
-		addElement(constsym, fsys);
-		addElement(procsym, fsys);
-		addElement(identsym, fsys);
-		addElement(ifsym, fsys);
-		addElement(callsym, fsys);
-		addElement(beginsym, fsys);
-		addElement(whilesym, fsys);
-	}
-	setsym result = copySet(fsys);
-	free(fsys);
-	return result;
-
-}

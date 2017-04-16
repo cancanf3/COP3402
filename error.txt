@@ -1,0 +1,230 @@
+var x;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+	x + 2
+begin
+	x := 2;
+	if odd x then 
+		x := x * 3
+	else if x < 2 then
+		x := x * 4
+	else
+		call a;
+
+end.
+
+
+Incorrect symbol after procedure declaration
+Identifier must be followed by :=
+
+
+
+-----------------------------------------------
+
+var x;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2;
+	if odd x then 
+		x := x * 3
+	else if x < 2 then
+		x := x * 4
+	else
+		call a;
+
+end
+
+Queue Empty
+Period expected
+
+
+------------------------------------------------
+
+var x;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2
+	if odd x then 
+		x := x * 3
+	else if x < 2 then
+		x := x * 4
+	else
+		call a;
+
+end.
+
+Semicolon between statements missing
+
+
+------------------------------------------------
+
+var x;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2;
+	if odd x then 
+		x := x * 3
+	else
+	else
+		call a;
+
+end.
+
+Incorrect symbol following statement
+--Error Recovery: Ignoring token => else
+Semicolon between statements missing
+
+-------------------------------------------------
+
+var x;
+begin
+	x := 2;
+	if odd x 
+		x := x * 3
+	else
+		x := 2;
+
+end.
+
+The preceding factor cannot begin with this symbol
+--Error Recovery: Ignoring token => x
+--Error Recovery: Ignoring token => :=
+--Error Recovery: Ignoring token => x
+The preceding factor cannot begin with this symbol
+--Error Recovery: Ignoring token => else
+--Error Recovery: Ignoring token => x
+--Error Recovery: Ignoring token => :=
+--Error Recovery: Ignoring token => 2
+then	 expected
+
+
+---------------------------------------------
+
+var x;
+procedure b;
+	var z;
+	end;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2;
+	if odd x then
+		x := x * 3
+	else
+		call a
+
+end.
+
+Statement expected
+--Error Recovery: Ignoring token => end
+--Error Recovery: Ignoring token => ;
+
+
+-----------------------------------------------
+
+var x;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2;
+	if (odd x) then
+		x := x * 3
+	else
+		call a
+
+end.
+
+--Error Recovery: Ignoring token => odd
+Compare operator expected
+
+------------------------------------------------
+
+var x;
+procedure a;
+	var z;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2;
+	if odd x then
+		x := x * 3
+	else
+		call a
+
+end.
+
+Undeclared identifier
+
+
+----------------------------------------------
+
+var x;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2;
+	odd;
+	if odd x then
+		x := x * 3
+	else
+		call a
+
+end.
+
+--Error Recovery: Ignoring token => odd
+
+----------------------------------------------
+
+var x;
+procedure a;
+	var y;
+	begin
+		y := 4;
+		x := (x+3)*2/2;
+	end;
+begin
+	x := 2;
+	if odd  do
+		x := x * 3
+	else
+		call a
+
+end.
+
+--Error Recovery: Ignoring token => else
+then	 expected
+
+

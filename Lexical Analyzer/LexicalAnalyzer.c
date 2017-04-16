@@ -18,7 +18,7 @@ queue* LexicalAnalyzer ( int flag ) {
 
 
 
-	// Open the file
+	// //Open the file
 	// char name[100];
 	// printf("select the input file: ");
 	// scanf("%s", name);

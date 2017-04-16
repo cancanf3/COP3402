@@ -1,0 +1,167 @@
+University of Central Florida
+COP3402 System Software
+
+PL/0 User’s Manual 
+
+Author: Jose Eduardo Peña 
+Professor: Dr.Euripides Montagne
+Last updated: 17 April 2017
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1.0 Programming in PL/0 
+
+PL/0 is a fairly simple language that supports constants, integers, and procedures. PL/0 programs have the following structure: 
+	1.	constant definitions 
+	2.	variable declarations 
+	3.	procedure declarations 
+	 a. subroutine definition, same as program structure 
+  4. statement(s) 
+
+For the most part, whitespace is ignored (except in certain cases in order to differentiate between reserved keywords and identifiers). Additionally, anything between comment delimiters, e.g., /* and */, will be ignored. Finally, PL/0 programs must end with a period. 
+Figure 1 shows an example of a simple PL/0 program with comments: 
+
+      var foo;
+      begin
+          foo := /*here is a comment*/ 1;
+          /*comments
+            can
+            span
+            multiple
+            lines*/
+      out foo; end. 
+      Figure 1: Program with comments 
+
+
+
+1.1 Datatypes 
+
+Currently, this implementation of PL/0 supports the following datatypes: 
+	•	constants (const) 
+	•	integers (int) 
+	•	procedures (procedure)  An identifier is used to refer to specific instances of each datatype. Identifiers must be no more than 11 characters in length, must begin with a character, may contain uppercase and lowercase letters as well as numbers, and must not be any of the reserved keywords listed in.  In addition to identifiers, number literals are used through the program for arithmetic and other operations. Number literals must be integers and must be no more than 5 digits long. We do not currently support negative number literals.  
+
+1.1.1 Constants 
+
+Constants are integer types. They may only be defined once per program. Constants are immutable; that is, you may not assign values to them after they have been defined. You may define more than one constant at a time by separating the identifiers by commas. Constant definitions must end with a semicolon. Constants are defined using the following syntax:
+
+     const FOO = 1, BAR = 2;
+
+After you define a constant, you may use them throughout your program as you would an ordinary number. The compiler converts constants to their respective values upon compilation, so the following example, 
+
+     foo := FOO + BAR;
+is equivalent to this: 
+    foo := 1 + 2; 
+
+
+1.1.2 Integers 
+
+Integers are mutable; meaning, you can define and reassign their values later on. Integers are declared at the top of the file after any constants (if there are any), and you may declare more than one at a time. Integers are defined with values as constants are. Instead, you must assign integers values using the assignment operator := (as seen above). Here is an example of how to declare integers in PL/0: 
+     var foo, bar, baz;
+You may assign variables values of constants or other variables, number literals, or expressions. 
+
+1.1.3 Procedures 
+Procedures can be thought of as subroutines or sub-programs. They contain nearly everything that a program could contain. Please be aware that this version of PL/0 currently supports up to 10 levels of nested procedures (1 Main + 10 Procedures). Figure 2 shows a procedure that prints the numbers 1 through 10: 
+
+                procedure count10;
+                    var a;
+                begin 
+                  a := 1; 
+                  while a <= 10 do
+                  begin
+                    a := a + 1;       
+                  end;
+                  write a;                          
+                end; 
+
+                Figure 2: Procedure that counts 1 to 10 
+
+
+
+
+1.2 Expressions 
+
+Expressions get their name from mathematical expressions which represent or return a value. Expressions can be composed of constant or variable identifiers, number literals, or the arithmetic symbols +, -, *, /, (, and ). PL/0 follows the standard order of operations when calculating the value of an expression. 
+
+1.3 Statements 
+
+Statements are how the program gets things done. Except for the last statement in a block, statements must end with a semicolon. 
+
+1.3.1 Read/Write 
+
+Read is handled by using the in keyword followed by a variable identifier (you cannot use a constant or procedure identifier), e.g., 
+read foo; This will assign whatever value the user inputs to foo. 
+Write is handled by using the out keyword followed by a constant or variable identifier Here is an example: 
+     write foo;
+
+1.3.2 Blocks 
+
+Blocks are collections of statements, each of which are separated by a semicolon. Blocks are denoted by the begin and end keywords. See section 1.1.3 (Procedures) for how a block can be nested inside of other statements. 
+1.3.3 Assignment 
+As mentioned before, variables can be assigned values by using constant or variable identifiers, number literals, or expressions. The assignment operator, :=, only works for variables inside of a statement. Currently, you are not able to assign variables initial values at the time of declaration. 
+
+
+1.3.4 Conditionals 
+
+To conditionally execute code, use the conditional keywords if, then, and else. These allow you to check a condition and, if true, execute some code, or else execute some other code. A conditional expression can either be two expressions separated by a relational operator (e.g., expression [rel-op] expression) or else using the unary odd keyword: 
+odd x + y 
+The odd keyword will return true if the expression evaluates to an odd number, or else it will return false if the expression evaluates to an even number. 
+Valid relational operations are as follows: • =(equal) 
+• <>(notequal) • <(lessthan) • <=(lessthanorequal) • >(greaterthan) • >=(greaterthanorequalto) 
+Here is an example of an if-then without an else: if 1 = 1 then out 1; 
+And with an else: if 1 <> 1 then out 1 else out 0; 
+Conditionals can be nested in one another. One such use is checking multiple conditions before executing code. For example, here's a snippet from a basic four-function calculator program: 
+     if op = ADD then call add
+     else if op = SUB then call sub
+     else if op = MULT then call mult
+     else if op = DIV then call div
+     else done := 1;
+
+
+
+
+
+
+
+1.3.5 Loops 
+
+Loops are another useful construct delimited by the while and do keywords. Often you will need to iterate over a range of numbers, or perhaps to perform the same set of instructions until some condition is false. From the same four-function calculator program used above, Figure 3 shows an example of a while loop. 
+
+1.3.6 Calling Procedures 
+
+To invoke a procedure, use the call keyword. There is no way to explicitly pass arguments to a procedure. However, procedures have access to any variables and procedures that are declared within their scope.
+
+2.0 Compiling and Executing Programs Written in PL/0 
+
+The pl0-compiler program is both a compiler and a virtual machine for PM/0 (the machine for which the PL/0 ISA was designed). 
+
+2.1 Building pl0-compiler 
+These instructions assume you have experience using a terminal. You will need GCC and GNU Make prior to building pl0-compiler. To build the compiler’s executable file, do the following: 
+  1.	 Obtain a copy of the source code for pl0-compiler 
+  2.	 Open a terminal (or command prompt) and navigate to the project directory 
+	   • You should see a file called README.text and another called Makefile. 
+  3. Run make 
+	   • This will output a file called pcc. 
+  4. Run make clean to clean all the compiled files.
+
+
+
+2.2 Running PL/0 Programs with pl0-compiler 
+
+To begin, open a terminal (or command prompt) and navigate to wherever your pl0-compiler is located. The default mode is to display only write/read calls from the PL/0 program. To do this, run the following: 
+
+  ./pcc -lav 
+
+Select input file: input.txt
+
+
+Then the program will ask you for the name of the file with its absolute route.
+
+
+
+If you want to see more output, there are three command-line flags available that you can use. 
+	•	The -l flag instructs pl0-compiler to display the internal representation of the PL/0 program. That is, it displays the token file including both a raw and a pretty format. 
+	•	The -a flag instructs pl0-compiler to display the generated assembly code in both a raw and pretty format. 
+	•	The -v flag instructs pl0-compiler to display a stack trace while the virtual machine executes your program.  These flags may be used in any combination for more or less output. To use more than one flag, you can run something like this:       ./pcc -l -a -v
+	•	or else, like this:    
+
+    ./pcc -lav 
